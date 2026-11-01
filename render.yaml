@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: igas-cms
+    name: igas-client-cms
     runtime: node
     plan: free
-    region: ohio
-    repo: https://github.com/atulvjd/igas-production
+    region: oregon
+    repo: https://github.com/igasweb/igas-production
     branch: main
     rootDir: cms
     buildCommand: npm ci --include=dev && npm run build
@@ -25,15 +25,15 @@ services:
       - key: UPLOAD_PROVIDER
         value: cloudinary
       - key: CLOUDINARY_NAME
-        value: cvmenxou
+        value: mnwliy2r
       - key: CLOUDINARY_KEY
         sync: false
       - key: CLOUDINARY_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://igas-production.vercel.app
+        value: https://igas-production-nu.vercel.app
       - key: NEXT_APP_URL
-        value: https://igas-production.vercel.app
+        value: https://igas-production-nu.vercel.app
       - key: APP_KEYS
         sync: false
       - key: API_TOKEN_SALT

@@ -20,3 +20,5 @@ cms/public/uploads
 node_modules
 .next/
 .DS_Store
+# Private account migration backups
+.migration-backups/
