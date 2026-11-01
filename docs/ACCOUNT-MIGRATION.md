@@ -2,14 +2,14 @@
 
 Status as of 1 November 2026. Client account: `IGASweb@gcassociates.in`.
 
-The website, CMS, database, media provider and source repository are running under the client's accounts. Data preservation, client administrator access and the replacement website API token are verified. Final handover remains incomplete: the legacy website redirect is prepared but not deployed, automatic Git deployments still need verification, and original collaborator access still requires removal.
+The website, CMS, database, media provider and source repository are running under the client's accounts. Data preservation, client administrator access and the replacement website API token are verified. Final handover remains incomplete: the legacy website still serves its original application, the repaired Render Git integration needs an exact-SHA deployment check, and original collaborator access still requires review.
 
 ## Client resources
 
 | Component | Client resource | Verified state |
 | --- | --- | --- |
 | Source code | https://github.com/igasweb/igas-production | Ownership transferred; local Git remote points to the client repository. |
-| Website | https://igas-production-nu.vercel.app | Vercel team `igas2`, project `igas-production`. Last verified deployment `HPsuywcFXb6T95w2XJX3WfYpxRYs` reached Ready in 49 seconds, before the latest local handover changes. |
+| Website | https://igas-production-nu.vercel.app | Vercel team `igas2`, project `igas-production`. Deployment `HPsuywcFXb6T95w2XJX3WfYpxRYs` reached Ready in 49 seconds. Push of handover commit `e90b19c` automatically started deployment `BgFk9rytiZFFeCwU8PEGfzEUXKHf`; its final status still needs confirmation. |
 | CMS | https://igas-client-cms.onrender.com/admin | Render service `srv-dbhe4tec6qcc73f65c5g`; health endpoint returned 204 on 1 November. |
 | Database | Neon project `IGAS-CMS` | Initial copy of all 105 tables and 1,855 rows matched the source by per-table checksums immediately after restoration. Both databases are currently reachable. |
 | Media uploads | Cloudinary cloud `mnwliy2r` | Synthetic upload and removal passed on 29 October. |
@@ -41,22 +41,24 @@ The three additional records use marker `migration-verification-1793290783729`. 
 
 ## Live verification
 
-The last full end-to-end verification ran on 29 October:
+Full end-to-end verification was repeated on 1 November after the credential and access cleanup:
 
-- Enquiry and job application submissions returned 200 and appeared in their separate client CMS inboxes with consent and PDF attachments. The downloaded application PDF exactly matched the submitted bytes.
-- A newsletter signup returned 200 and was stored as pending with consent version `newsletter-v1`.
+- Enquiry and job application submissions returned 200 and appeared in their separate client CMS inboxes with consent and PDF attachments. Downloaded enquiry and application PDFs exactly matched the submitted bytes.
+- A newsletter signup returned 200 and was stored as pending with consent version `newsletter-v1`. The three fresh run-specific fixtures were removed after verification; the older labelled review records remain.
 - The enabled CMS cache-revalidation webhook targeted the client website and its authenticated Trigger test succeeded.
 - Public reads of private enquiries, applications, subscribers and newsletter drafts returned 404. Unauthenticated cache revalidation returned 401.
 - Empty enquiries and newsletter signup without consent returned 400.
 - Website, careers page and sitemap returned 200; CMS health returned 204. Cloudinary upload and synthetic-media cleanup passed.
 
-On 1 November, after the superseded tokens were expired, the client website and careers page returned 200 and CMS health returned 204. The newer Vercel Secret-storage changes and local redirect changes require another deployment and verification; the older end-to-end results do not prove that those pending deployments have completed.
+On 1 November, after the superseded tokens were expired, the client website and careers page returned 200 and CMS health returned 204. The newer handover code and Git-integration changes require deployment verification at the exact intended commit; these passing checks do not establish that the old website redirect is live.
 
 ## Deployments and legacy URL cutover
 
-Vercel Git settings show the connected repository `igasweb/igas-production`. Render shows the client email as Git credential owner and Auto-Deploy set to `On Commit`, with root directory `cms`. Actual push-triggered deployment behavior still needs verification against the exact new commit SHA in both hosting dashboards.
+Vercel Git settings show the connected repository `igasweb/igas-production`. Pushing handover commit `e90b19c` started automatic Vercel deployment `BgFk9rytiZFFeCwU8PEGfzEUXKHf`; confirm its final status and source SHA.
 
-The local Next.js configuration now includes a temporary, host-only redirect from `igas-production.vercel.app` to `igas-production-nu.vercel.app`. Next's redirect testing helper verified root, nested path, query-string and API-path behavior, and that the client host does not redirect or loop. The change has not yet been deployed. It must reach the original Vercel project as well as the client project before the legacy URL stops serving its original application.
+Render was initially created from a public repository URL. Although the settings showed `On Commit`, the push did not start a deployment because a Git-provider connection was missing. With the user's explicit approval, the Render GitHub integration was installed for only `igasweb/igas-production`. Render then listed that authorized repository, and it was selected in Update Source. A Deploy action was submitted, but no new deployment was yet visible. Push the next meaningful change under `cms/` and verify a new automatic Render deployment at that exact SHA; do not treat repository selection alone as successful automatic-deployment verification.
+
+The Next.js configuration now includes a temporary, host-only redirect from `igas-production.vercel.app` to `igas-production-nu.vercel.app`, committed in `e90b19c`. Next's redirect testing helper verified root, nested path, query-string and API-path behavior, and that the client host does not redirect or loop. The original website still returned HTTP 200 without redirecting after the push, so its Vercel project has not yet deployed the redirect. The change must reach that original project before the legacy URL stops serving its original application.
 
 Until the cutover is deployed and verified, original-site submissions still reach the original CMS/database. Keep the original CMS and database available while checking incoming records and verifying the redirect. The original services have not been deleted or suspended.
 
@@ -64,9 +66,9 @@ The repository's `render.yaml` now describes the client service and origins. The
 
 ## Remaining handover work
 
-1. Commit and deploy the prepared handover changes. Verify both automatic Git deployments at the exact intended SHA and confirm the production website and CMS remain healthy.
+1. Verify the final Vercel result for `e90b19c`, then push the next CMS deployment-documentation change to exercise the repaired Render connection. Confirm both providers deploy the exact intended new SHA and the production website and CMS remain healthy.
 2. Deploy the host-only redirect to the original Vercel project. Recheck post-copy submissions before cutover, then verify legacy root, nested paths, query strings and submission routes, plus absence of a redirect loop on the client host.
-3. Re-run authenticated cache revalidation and controlled submission checks after the latest settings are deployed.
+3. Repeat health and authenticated cache-revalidation checks after the Git-triggered CMS rollout. Repeat controlled submissions if deployment failures or further configuration changes warrant it; the 1 November end-to-end run already passed and its fresh fixtures were cleaned up.
 4. Remove remaining original collaborator access after verifying the client's retained access and recovery arrangements. The original administrator in the client CMS is already disabled with its sessions revoked. Complete any remaining application-secret rotation through a coordinated rollout.
 5. Decide when to retire the original CMS and hosting fallback after cutover is verified. Keep private backups protected and confirm the client has an appropriate recovery process.
 

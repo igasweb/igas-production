@@ -11,6 +11,14 @@ The client service is [igas-client-cms on Render](https://dashboard.render.com/w
 - Database: client Neon project `IGAS-CMS`; uploads: client Cloudinary cloud `mnwliy2r`.
 - The live service showed Auto-Deploy set to `On Commit`. Verify a push by checking that Render and Vercel both deploy the exact new commit SHA. Root-only changes may not trigger the CMS because its root directory is `cms`.
 
+## Git integration and automatic deployment
+
+The service was originally created from a public repository URL. This allowed manual builds but did not provide a working push trigger, despite Auto-Deploy showing `On Commit`. On 1 November, pushing handover commit `e90b19c` triggered Vercel but no Render deployment.
+
+With the user's explicit approval, the Render GitHub app was installed with access limited to `igasweb/igas-production`. Render listed that authorized repository, which was selected in Update Source. A Deploy action was submitted; no new deployment was visible immediately afterward. The Git-provider connection is configured, but automatic deployment remains unverified until a subsequent push produces a Render deployment at the exact new SHA.
+
+Use a meaningful change under `cms/` to exercise the root-directory trigger. Confirm the repository, `main` branch, `On Commit` setting and exact deployed SHA in the live service. Do not expand the GitHub installation to unrelated repositories when troubleshooting. A Vercel build alone does not prove the CMS has updated.
+
 The repository's `render.yaml` describes the client configuration. The existing live service was created separately and is not managed by an attached Blueprint. Do not apply the file expecting to update that service: creating a Blueprint can create additional resources. Check the Render service and resource bindings before any Blueprint rollout.
 
 ## Environment and credentials
